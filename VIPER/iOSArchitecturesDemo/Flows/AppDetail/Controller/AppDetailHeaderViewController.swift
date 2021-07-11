@@ -33,7 +33,6 @@ class AppDetailHeaderViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         fillData()
     }
     

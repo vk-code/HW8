@@ -16,7 +16,6 @@ final class SearchViewController: UIViewController {
         return self.view as! SearchView
     }
     
-    private let searchService = ITunesSearchService()
     var searchResults = [ITunesEntity]() {
         didSet {
             searchView.tableView.isHidden = false
@@ -98,14 +97,8 @@ extension SearchViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        let sResult = searchResults[indexPath.row]
-        
-        if let appResult = sResult as? ITunesApp {
-            let appDetaillViewController = AppDetailViewController(app: appResult)
-            appDetaillViewController.app = appResult
-            presenter.viewDidSelectRow(appResult)
-        }
-//        navigationController?.pushViewController(appDetaillViewController, animated: true)
+        let result = searchResults[indexPath.row]
+        presenter.viewDidSelectRow(result)
     }
 }
 
@@ -133,7 +126,7 @@ extension SearchViewController: SearchViewInput {
     // MARK: - Private
     
     func throbber(show: Bool) {
-        UIApplication.shared.isNetworkActivityIndicatorVisible = show
+//        UIApplication.shared.isNetworkActivityIndicatorVisible = show
     }
     
     func showError(error: Error) {
