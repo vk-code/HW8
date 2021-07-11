@@ -30,7 +30,10 @@ final class ITunesSearchService {
         static let mediaType = "media"
     }
     
-    public func getApps(forQuery query: String, then completion: CompletionApps?) {
+    public func getApps(forQuery query: String,
+                        then completion: CompletionApps?,
+                        cacheCompletion: ((Result<[ITunesApp]>) -> Void)?) {
+        
         let regionCode = Locale.current.regionCode ?? defaultRegionCode
         var parameters: Parameters = [:]
         parameters[Parameter.query] = query
@@ -50,6 +53,7 @@ final class ITunesSearchService {
                         let result = try self.decoder.decode(ITunesSearchResult<ITunesApp>.self, from: data)
                         let apps = result.results
                         completion?(.success(apps))
+                        cacheCompletion?(.success(apps))
                     } catch {
                         print(error)
                         completion?(.failure(error))
@@ -61,7 +65,10 @@ final class ITunesSearchService {
         }
     }
     
-    public func getSongs(forQuery query: String, completion: CompletionSongs?) {
+    public func getSongs(forQuery query: String,
+                         completion: CompletionSongs?,
+                         cacheCompletion: ((Result<[ITunesSong]>) -> Void)?) {
+        
         let regionCode = Locale.current.regionCode ?? defaultRegionCode
         var parameters: Parameters = [:]
         parameters[Parameter.query] = query
@@ -79,8 +86,9 @@ final class ITunesSearchService {
                 .withValue { data in
                     do {
                         let result = try self.decoder.decode(ITunesSearchResult<ITunesSong>.self, from: data)
-                        let apps = result.results
-                        completion?(.success(apps))
+                        let songs = result.results
+                        completion?(.success(songs))
+                        cacheCompletion?(.success(songs))
                     } catch {
                         print(error)
                         completion?(.failure(error))

@@ -28,13 +28,17 @@ enum SearchType: Int {
 }
 
 class SearchPresenter {
-    private let searchService = ITunesSearchService()
-    
+    private let interactor: SearchInteractorInput
+    private let router: SearchRouterInput
     weak var viewInput: (UIViewController & SearchViewInput)?
     
+    init(interactor: SearchInteractorInput, router: SearchRouterInput) {
+        self.interactor = interactor
+        self.router = router
+    }
     
     private func requestApps(with query: String) {
-        searchService.getApps(forQuery: query) { [weak self] (result) in
+        interactor.requestApps(with: query) { [weak self] (result) in
             guard let self = self else { return }
             
             self.viewInput?.throbber(show: false)
@@ -52,13 +56,11 @@ class SearchPresenter {
     }
     
     private func openAppDetails(with app: ITunesApp) {
-        let appDetailViewController = AppDetailViewController(app: app)
-        viewInput?.navigationController?.pushViewController(appDetailViewController, animated: true)
+        router.openAppDetail(for: app)
     }
     
-    
     private func requestMusic(with query: String) {
-        searchService.getSongs(forQuery: query) { [weak self] (result) in
+        interactor.requestSongs(with: query) { [weak self] (result) in
             guard let self = self else { return }
             
             self.viewInput?.throbber(show: false)
@@ -73,6 +75,10 @@ class SearchPresenter {
                 self.viewInput?.showError(error: error)
             }
         }
+    }
+    
+    private func openSongDetails(with song: ITunesSong) {
+        router.openSongDetail(for: song)
     }
 }
 
@@ -89,6 +95,10 @@ extension SearchPresenter: SearchViewOutput {
     func viewDidSelectRow(_ item: ITunesEntity) {
         if let app = item as? ITunesApp {
             openAppDetails(with: app)
+        }
+        
+        if let song = item as? ITunesSong {
+            openSongDetails(with: song)
         }
     }
 }
